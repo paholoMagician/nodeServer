@@ -1,0 +1,20 @@
+{
+    "ignore_this": "Seguir todas estas configuraciones en oreden",
+    "nodemon": "npm i nodemon",
+    "UUID": "npm i uuid",
+    "@types/node": "npm i -D typescript @types/node",
+    "axios": "npm i axios",
+    "winston": "npm i winston",
+    "ts-node": "npm i -D ts-node nodemon",
+    "npx_tsc": "npx tsc --init --outDir dist/ --rootDir src",
+    "transpilator": "npx tsc --watch",
+    "create_nodemon_json": {
+        "watch": [
+            "src"
+        ],
+        "ext": ".ts,.js",
+        "ignore": [],
+        "exec": "npx ts-node ./src/app.ts"
+    },
+    "rimraf": "npm i -D rimraf"
+}
