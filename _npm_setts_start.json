@@ -16,5 +16,13 @@
         "ignore": [],
         "exec": "npx ts-node ./src/app.ts"
     },
-    "rimraf": "npm i -D rimraf"
+    "rimraf": "npm i -D rimraf",
+    "jest": "npm i -D jest types/jest ts-jest supertest",
+    "load_jest_file_config": "npx jest --init",
+    "jest_config_step_1": "no",
+    "jest_config_step_2": "yes",
+    "jest_config_step_3": "node",
+    "jest_config_step_4": "yes",
+    "jest_config_step_5": "V8",
+    "jest_config_step_6": "no"
 }
