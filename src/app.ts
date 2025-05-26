@@ -4,8 +4,16 @@ import userController from './controllers/userController';
 import pool from './database/database';
 import { RowDataPacket } from 'mysql2';
 
-const PORT = 3000;
-const HOST = '192.168.100.6';
+// local
+// const PORT = 3001;
+// server demo
+const PORT = 9998;
+// HOME
+// const HOST = '192.168.100.6';
+// WORK
+// const HOST = '192.168.55.64';
+// SERVER DEMO
+const HOST = '104.243.43.213';
 
 // Verificar conexión a MySQL antes de iniciar el servidor
 async function testDatabaseConnection() {
@@ -34,7 +42,7 @@ const server = createServer(async (req, res) => {
     console.log(`📦 [${new Date().toISOString()}] ${method} ${path}`);
 
     // Configurar CORS básico
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin',  '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 

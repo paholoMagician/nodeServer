@@ -16,8 +16,16 @@ const http_1 = require("http");
 const url_1 = __importDefault(require("url"));
 const userController_1 = __importDefault(require("./controllers/userController"));
 const database_1 = __importDefault(require("./database/database"));
-const PORT = 3000;
-const HOST = '192.168.100.6';
+// local lan
+// const PORT = 3001;
+// server demo
+const PORT = 9998;
+// HOME
+// const HOST = '192.168.100.6';
+// WORK
+// const HOST = '192.168.55.64';
+// SERVER DEMO
+const HOST = '104.243.43.213';
 // Verificar conexión a MySQL antes de iniciar el servidor
 function testDatabaseConnection() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -25,7 +33,6 @@ function testDatabaseConnection() {
             const connection = yield database_1.default.getConnection();
             console.log('✅ Conexión a MySQL establecida correctamente');
             connection.release();
-            // Verificar si la tabla users existe (versión corregida)
             const [tables] = yield database_1.default.execute("SHOW TABLES LIKE 'users'");
             if (tables.length === 0) {
                 console.warn('⚠️ La tabla "users" no existe en la base de datos');
@@ -45,33 +52,60 @@ const server = (0, http_1.createServer)((req, res) => __awaiter(void 0, void 0, 
     const path = parsedUrl.pathname;
     const method = req.method;
     console.log(`📦 [${new Date().toISOString()}] ${method} ${path}`);
+    // Configurar CORS básico
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    // Manejar preflight para CORS
+    if (method === 'OPTIONS') {
+        res.writeHead(204);
+        res.end();
+        return;
+    }
     // API Routes
-    if (path === '/api/users' && method === 'POST') {
-        yield userController_1.default.create(req, res);
+    try {
+        if (path === '/api/auth/login' && method === 'POST') {
+            yield userController_1.default.login(req, res);
+        }
+        else if (path === '/api/users' && method === 'POST') {
+            yield userController_1.default.create(req, res);
+        }
+        else if (path === '/api/users' && method === 'GET') {
+            yield userController_1.default.getAll(req, res);
+        }
+        else if ((path === null || path === void 0 ? void 0 : path.startsWith('/api/users/')) && method === 'GET') {
+            yield userController_1.default.getById(req, res);
+        }
+        else if ((path === null || path === void 0 ? void 0 : path.startsWith('/api/users/')) && method === 'PUT') {
+            yield userController_1.default.update(req, res);
+        }
+        else if ((path === null || path === void 0 ? void 0 : path.startsWith('/api/users/')) && method === 'DELETE') {
+            yield userController_1.default.delete(req, res);
+        }
+        else {
+            userController_1.default.sendResponse(res, 404, {
+                success: false,
+                message: 'Endpoint no encontrado'
+            });
+        }
     }
-    else if (path === '/api/users' && method === 'GET') {
-        yield userController_1.default.getAll(req, res);
-    }
-    else if ((path === null || path === void 0 ? void 0 : path.startsWith('/api/users/')) && method === 'GET') {
-        yield userController_1.default.getById(req, res);
-    }
-    else {
-        userController_1.default.sendResponse(res, 404, {
-            success: false,
-            message: 'Endpoint no encontrado'
-        });
+    catch (error) {
+        userController_1.default.handleError(res, error);
     }
 }));
-// Iniciar servidor después de verificar la conexión a DB
+// Iniciar servidor
 function startServer() {
     return __awaiter(this, void 0, void 0, function* () {
         yield testDatabaseConnection();
         server.listen(PORT, HOST, () => {
             console.log(`🚀 Servidor corriendo en http://${HOST}:${PORT}`);
             console.log('Endpoints disponibles:');
+            console.log(`- POST   http://${HOST}:${PORT}/api/auth/login`);
             console.log(`- POST   http://${HOST}:${PORT}/api/users`);
             console.log(`- GET    http://${HOST}:${PORT}/api/users`);
             console.log(`- GET    http://${HOST}:${PORT}/api/users/:id`);
+            console.log(`- PUT    http://${HOST}:${PORT}/api/users/:id`);
+            console.log(`- DELETE http://${HOST}:${PORT}/api/users/:id`);
         });
     });
 }

@@ -14,9 +14,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../database/database"));
 exports.default = {
+    // Añade este método para buscar por email
+    getByEmail(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const [rows] = yield database_1.default.query('SELECT * FROM users WHERE email = ?', [email]);
+            return rows;
+        });
+    },
     // CREATE
     createUser(user) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.table(user);
             const [result] = yield database_1.default.execute('INSERT INTO users (nombre, email, password, estado, rol) VALUES (?, ?, ?, ?, ?)', [user.nombre, user.email, user.password, user.estado, user.rol]);
             return result;
         });

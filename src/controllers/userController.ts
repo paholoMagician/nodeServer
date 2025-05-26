@@ -31,12 +31,12 @@ export default {
 
             // Hash password antes de guardar
             const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(userData.password, salt);
+            // const hashedPassword = await bcrypt.hash(userData.password, salt);
 
             const newUser: any = {
                 nombre: userData.nombre,
                 email: userData.email,
-                password: hashedPassword,
+                password: userData.password,
                 estado: 1, // Activo por defecto
                 rol: userData.rol || 'USR' // Rol por defecto
             };
@@ -69,15 +69,12 @@ export default {
             const users = await userModel.getByEmail(email);
             const user = users[0];
 
-            if (!user) {
-                throw new Error('Credenciales inválidas');
-            }
-
+            if (!user) throw new Error('Credenciales inválidas');
+            if ( password != user.password ) throw new Error('Contraseña incorrecta');
+            
             // Verificar contraseña
-            const isMatch = await bcrypt.compare(password, user.password);
-            if (!isMatch) {
-                throw new Error('Credenciales inválidas');
-            }
+            // const isMatch = await bcrypt.compare(password, user.password);
+            // if (!isMatch) throw new Error('Credenciales inválidas');
 
             // Generar tokens
             const token = jwt.sign(
