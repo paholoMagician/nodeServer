@@ -1,5 +1,6 @@
 {
     "ignore_this": "Seguir todas estas configuraciones en oreden",
+    "env": "npm install dotenv, npm install --save-dev @types/dotenv",
     "nodemon": "npm i nodemon",
     "UUID": "npm i uuid",
     "@types/node": "npm i -D typescript @types/node",
@@ -24,5 +25,7 @@
     "jest_config_step_3": "node",
     "jest_config_step_4": "yes",
     "jest_config_step_5": "V8",
-    "jest_config_step_6": "no"
+    "jest_config_step_6": "no",
+    "JWT": "npm install jsonwebtoken bcryptjs",
+    "jsonwebtoken": "npm install -D @types/jsonwebtoken @types/bcryptjs"
 }
