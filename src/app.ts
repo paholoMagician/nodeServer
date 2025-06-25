@@ -1,7 +1,14 @@
-import { findHeroById } from "./data/services/hero.service";
+import express from 'express';
+import testRoutes from './routes/routes';
 
+const app = express();
+const PORT = 6565;
 
+// Configuramos las rutas bajo el prefijo /api
+app.use('/api', testRoutes);
 
-
-const hero = findHeroById(3);
-console.log(hero?.nombreHumano ?? 'Heroe no encontrado');
+// Iniciamos el servidor
+app.listen(PORT, () => {
+    console.log(`🚀 Ready server in http://localhost:${PORT}`);
+    console.log(`🔍 Endpoint deploy in http://localhost:${PORT}/api/test`);
+});
