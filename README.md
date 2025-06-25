@@ -1,24 +1,29 @@
-# NodeServer - Servidor Básico NodeJS/TypeScript
+# 🌐 NodeServer Starter | Inicio Rápido con NodeServer
 
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D16.0.0-brightgreen)](https://nodejs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-4.0+-blue)](https://www.typescriptlang.org/)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+![Node.js](https://img.shields.io/badge/Node.js-18%2B-green)
+![TypeScript](https://img.shields.io/badge/TypeScript-5%2B-blue)
+![Express](https://img.shields.io/badge/Express-4.x-lightgrey)
 
-Servidor NodeJS con TypeScript para inicio rápido de proyectos. Versión base 1.0.2
+Basic Node.js server with `.env` configuration | Servidor Node.js básico con configuración por `.env`
 
-**Autor:** Andre Rivera
+**Author/Author:** Andre Rivera  
+**Version/Versión:** 1.0.2
 
-## 🚀 Características
+## 🌟 Features | Características
+- ✅ Simple `.env` configuration | Configuración simple con `.env`
+- ✅ Ready-to-use test endpoint | Endpoint de prueba listo para usar
+- ✅ TypeScript pre-configured | TypeScript preconfigurado
+- ✅ Easy to scale | Fácil de escalar
 
-- Servidor básico con TypeScript
-- Endpoint de prueba (`/api/test`)
-- Configuración mínima para empezar
-- Estructura organizada con rutas separadas
-- Puerto configurable (default: 6565)
+## 🛠️ Installation | Instalación
 
-## 📦 Instalación
-
-1. Clona el repositorio:
 ```bash
-git clone https://github.com/tu-usuario/nodeServer.git
+# Clone repository | Clonar repositorio
+git clone [your-repo-url] | git clone [tu-repositorio]
 cd nodeServer
+
+# Install dependencies | Instalar dependencias
+npm install
+
+# Create .env file | Crear archivo .env
+cp .env.example .env
