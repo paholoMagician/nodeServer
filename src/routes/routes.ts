@@ -2,12 +2,12 @@ import { Router } from 'express';
 
 const router = Router();
 
-// Definimos el endpoint de test
 router.get('/test', (req, res) => {
-    res.status(200).json({
+    res.json({
         status: 'success',
         message: 'El servidor está activo y funcionando',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development'
     });
 });
 
