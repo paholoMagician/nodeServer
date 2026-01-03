@@ -66,6 +66,13 @@ io.on('connection', (socket: Socket) => {
         }
     });
 
+    socket.on('deleteMessage', (data) => {
+        const { messageId, receiverId, senderId } = data;
+        // Broadcast to receiver and sender
+        io.to(receiverId.toString()).emit('messageDeleted', { messageId });
+        io.to(senderId.toString()).emit('messageDeleted', { messageId });
+    });
+
     socket.on('disconnect', async () => {
         const userId = (socket as any).userId;
         if (userId) {
@@ -77,7 +84,8 @@ io.on('connection', (socket: Socket) => {
 });
 
 httpServer.listen(PORT, () => {
-    console.log(`🚀 Server ready at http://localhost:${PORT}`);
+    console.log(`🚀 Server ready at http://152.53.89.82:${PORT}`);
+    console.log(`📝 Test the API with Postman: GET http://152.53.89.82:${PORT}/api/test`);
 });
 
 // ✅ Evita bloqueos de puerto

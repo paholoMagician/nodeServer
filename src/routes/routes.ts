@@ -6,7 +6,14 @@ const router = Router();
 router.get('/test', (req, res) => {
     res.status(200).json({
         status: 'success',
-        message: 'El servidor está activo y funcionando',
+        message: 'RetroChat Backend is ONLINE',
+        ip: '152.53.89.82',
+        port: 6567,
+        endpoints: {
+            auth: '/api/auth',
+            chat: '/api/chat',
+            test: '/api/test'
+        },
         timestamp: new Date().toISOString()
     });
 });

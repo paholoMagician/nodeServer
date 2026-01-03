@@ -27,3 +27,11 @@ export const getChatHistory = async (userId1: number, userId2: number): Promise<
     );
     return rows as Message[];
 };
+
+export const deleteMessage = async (messageId: number, userId: number): Promise<boolean> => {
+    const [result] = await pool.query<ResultSetHeader>(
+        'DELETE FROM messages WHERE id = ? AND from_user_id = ?',
+        [messageId, userId]
+    );
+    return result.affectedRows > 0;
+};
