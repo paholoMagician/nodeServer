@@ -5,6 +5,7 @@ import { Server, Socket } from 'socket.io';
 import testRoutes from './routes/routes';
 import authRoutes from './routes/auth.routes';
 import chatRoutes from './routes/chat.routes';
+import userRoutes from './routes/user.routes';
 import { createMessage } from './models/message.model';
 import { updateUserStatus } from './models/user.model';
 
@@ -14,6 +15,8 @@ const PORT = process.env.PORT || 6567;
 
 app.use(cors());
 app.use(express.json());
+// Serve static files from wwwroot
+app.use(express.static('wwwroot'));
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -26,6 +29,7 @@ const io = new Server(httpServer, {
 app.use('/api', testRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/users', userRoutes);
 
 // Socket.io Logic
 io.on('connection', (socket: Socket) => {

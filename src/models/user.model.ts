@@ -5,6 +5,7 @@ export interface User {
     id?: number;
     username: string;
     password?: string;
+    profile_picture?: string;
     is_online?: boolean;
     created_at?: Date;
 }
@@ -30,6 +31,29 @@ export const updateUserStatus = async (userId: number, isOnline: boolean): Promi
 };
 
 export const getOnlineUsers = async (): Promise<User[]> => {
-    const [rows] = await pool.query<RowDataPacket[]>('SELECT id, username, is_online, created_at FROM users ORDER BY is_online DESC, username ASC');
+    const [rows] = await pool.query<RowDataPacket[]>('SELECT id, username, is_online, created_at, profile_picture FROM users ORDER BY is_online DESC, username ASC');
     return rows as User[];
+};
+
+export const updateUser = async (userId: number, user: Partial<User>): Promise<void> => {
+    const fields: string[] = [];
+    const values: any[] = [];
+
+    if (user.username) {
+        fields.push('username = ?');
+        values.push(user.username);
+    }
+    if (user.password) {
+        fields.push('password = ?');
+        values.push(user.password);
+    }
+    if (user.profile_picture) {
+        fields.push('profile_picture = ?');
+        values.push(user.profile_picture);
+    }
+
+    if (fields.length === 0) return;
+
+    values.push(userId);
+    await pool.query(`UPDATE users SET ${fields.join(', ')} WHERE id = ?`, values);
 };
