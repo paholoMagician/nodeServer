@@ -8,12 +8,13 @@ export interface User {
     profile_picture?: string;
     is_online?: boolean;
     created_at?: Date;
+    estado_terminos_condiciones?: boolean;
 }
 
 export const createUser = async (user: User): Promise<number> => {
     const [result] = await pool.query<ResultSetHeader>(
-        'INSERT INTO users (username, password) VALUES (?, ?)',
-        [user.username, user.password]
+        'INSERT INTO users (username, password, estado_terminos_condiciones) VALUES (?, ?, ?)',
+        [user.username, user.password, user.estado_terminos_condiciones || false]
     );
     return result.insertId;
 };

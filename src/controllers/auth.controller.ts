@@ -11,7 +11,7 @@ const hashPassword = (password: string): string => {
 
 export const register = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { username, password } = req.body;
+        const { username, password, estado_terminos_condiciones } = req.body;
         if (!username || !password) {
             res.status(400).json({ message: 'Username and password are required' });
             return;
@@ -24,7 +24,11 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         }
 
         const hashedPassword = hashPassword(password);
-        const userId = await createUser({ username, password: hashedPassword });
+        const userId = await createUser({
+            username,
+            password: hashedPassword,
+            estado_terminos_condiciones: estado_terminos_condiciones || false
+        });
 
         res.status(201).json({ message: 'User registered successfully', userId });
     } catch (error) {
