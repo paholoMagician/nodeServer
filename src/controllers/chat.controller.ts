@@ -14,16 +14,34 @@ export const getOnlineUsers = async (req: Request, res: Response): Promise<void>
 
 export const sendMessage = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { from_user_id, to_user_id, content } = req.body;
-        if (!from_user_id || !to_user_id || !content) {
+        const { from_user_id, to_user_id, content, file_url } = req.body;
+        if (!from_user_id || !to_user_id) {
             res.status(400).json({ message: 'Missing required fields' });
             return;
         }
 
-        const messageId = await createMessage({ from_user_id, to_user_id, content });
+        const messageId = await createMessage({ from_user_id, to_user_id, content: content || '', file_url });
         res.status(201).json({ message: 'Message sent', messageId });
     } catch (error) {
         console.error('Send message error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+export const uploadChatFile = async (req: Request, res: Response): Promise<void> => {
+    try {
+        if (!req.file) {
+            res.status(400).json({ message: 'No file uploaded' });
+            return;
+        }
+
+        const relativePath = req.file.path.replace('wwwroot\\', '').replace('wwwroot/', '').replace(/\\/g, '/');
+        res.status(200).json({
+            message: 'File uploaded successfully',
+            path: relativePath
+        });
+    } catch (error) {
+        console.error('Upload chat file error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 };

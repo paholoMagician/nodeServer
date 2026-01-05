@@ -46,18 +46,20 @@ io.on('connection', (socket: Socket) => {
     });
 
     socket.on('sendMessage', async (data) => {
-        const { senderId, receiverId, message } = data;
+        const { senderId, receiverId, message, file_url } = data;
         try {
             const messageId = await createMessage({
                 from_user_id: senderId,
                 to_user_id: receiverId,
-                content: message
+                content: message,
+                file_url: file_url
             });
 
             const payload = {
                 id: messageId,
                 sender_id: senderId,
                 message: message,
+                file_url: file_url,
                 created_at: new Date()
             };
 

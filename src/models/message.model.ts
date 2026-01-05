@@ -6,13 +6,14 @@ export interface Message {
     from_user_id: number;
     to_user_id: number;
     content: string;
+    file_url?: string | null;
     created_at?: Date;
 }
 
 export const createMessage = async (message: Message): Promise<number> => {
     const [result] = await pool.query<ResultSetHeader>(
-        'INSERT INTO messages (from_user_id, to_user_id, content) VALUES (?, ?, ?)',
-        [message.from_user_id, message.to_user_id, message.content]
+        'INSERT INTO messages (from_user_id, to_user_id, content, file_url) VALUES (?, ?, ?, ?)',
+        [message.from_user_id, message.to_user_id, message.content, message.file_url || null]
     );
     return result.insertId;
 };
