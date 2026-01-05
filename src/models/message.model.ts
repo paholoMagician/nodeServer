@@ -22,7 +22,11 @@ export const createMessage = async (message: Message): Promise<number> => {
 export const getChatHistory = async (userId1: number, userId2: number | null, groupId: number | null = null): Promise<Message[]> => {
     if (groupId) {
         const [rows] = await pool.query<RowDataPacket[]>(
-            'SELECT * FROM messages WHERE group_id = ? ORDER BY created_at ASC',
+            `SELECT m.*, u.username as sender_username, u.profile_picture as sender_profile_picture 
+             FROM messages m 
+             LEFT JOIN users u ON m.from_user_id = u.id 
+             WHERE m.group_id = ? 
+             ORDER BY m.created_at ASC`,
             [groupId]
         );
         return rows as Message[];
