@@ -27,6 +27,14 @@ export const findUserByUsername = async (username: string): Promise<User | null>
     return null;
 };
 
+export const findUserById = async (userId: number): Promise<User | null> => {
+    const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM users WHERE id = ?', [userId]);
+    if (rows.length > 0) {
+        return rows[0] as User;
+    }
+    return null;
+};
+
 export const updateUserStatus = async (userId: number, isOnline: boolean): Promise<void> => {
     await pool.query('UPDATE users SET is_online = ? WHERE id = ?', [isOnline, userId]);
 };

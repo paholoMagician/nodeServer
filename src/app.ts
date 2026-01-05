@@ -66,6 +66,10 @@ io.on('connection', (socket: Socket) => {
                 file_url: file_url
             });
 
+            // Fetch sender details to enrich payload
+            const { findUserById } = require('./models/user.model');
+            const sender = await findUserById(senderId);
+
             const payload = {
                 id: messageId,
                 sender_id: senderId,
@@ -73,7 +77,9 @@ io.on('connection', (socket: Socket) => {
                 group_id: groupId,
                 message: message,
                 file_url: file_url,
-                created_at: new Date()
+                created_at: new Date(),
+                sender_username: sender ? sender.username : 'Unknown',
+                sender_profile_picture: sender ? sender.profile_picture : null
             };
 
             if (groupId) {
@@ -99,9 +105,15 @@ io.on('connection', (socket: Socket) => {
     socket.on('disconnect', async () => {
         const userId = (socket as any).userId;
         if (userId) {
-            await updateUserStatus(userId, false);
-            io.emit('userStatus', { userId, isOnline: false });
-            console.log(`User ${userId} marked offline`);
+            // Check if user has other sockets open
+            const sockets = await io.in(userId.toString()).fetchSockets();
+            if (sockets.length === 0) {
+                await updateUserStatus(userId, false);
+                io.emit('userStatus', { userId, isOnline: false });
+                console.log(`User ${userId} marked offline`);
+            } else {
+                console.log(`User ${userId} disconnected one socket but remains online (${sockets.length} active)`);
+            }
         }
     });
 });
