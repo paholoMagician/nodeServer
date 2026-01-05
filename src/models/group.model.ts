@@ -22,7 +22,7 @@ export interface GroupMember {
 export const createGroup = async (group: Group): Promise<number> => {
     const [result] = await pool.query<ResultSetHeader>(
         'INSERT INTO chat_groups (name, description, group_image, created_by) VALUES (?, ?, ?, ?)',
-        [group.name, group.description || null, group.group_image || 'default_group.png', group.created_by]
+        [group.name, group.description || null, group.group_image || 'src/default_user/default_group.jpg', group.created_by]
     );
     return result.insertId;
 };

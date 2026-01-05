@@ -14,6 +14,7 @@ export const createGroup = async (req: Request, res: Response): Promise<void> =>
         const groupId = await GroupModel.createGroup({
             name,
             description,
+            group_image: req.body.group_image || 'src/default_user/default_group.jpg',
             created_by: userId
         });
 
@@ -102,7 +103,7 @@ export const getGroupDetails = async (req: Request, res: Response): Promise<void
 export const updateGroup = async (req: Request, res: Response): Promise<void> => {
     try {
         const groupId = parseInt(req.params.groupId);
-        const { name, description, members } = req.body;
+        const { name, description, members, group_image } = req.body;
         const userId = (req as any).user.id;
 
         const group = await GroupModel.getGroupById(groupId);
@@ -113,7 +114,7 @@ export const updateGroup = async (req: Request, res: Response): Promise<void> =>
 
         // Ideally check if user is admin, but for now we skip strict check or assume it's done
 
-        await GroupModel.updateGroup(groupId, { name, description });
+        await GroupModel.updateGroup(groupId, { name, description, group_image });
 
         if (members && Array.isArray(members)) {
             await GroupModel.removeAllMembers(groupId);
