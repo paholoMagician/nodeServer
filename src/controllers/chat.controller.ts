@@ -56,7 +56,8 @@ export const getChatHistory = async (req: Request, res: Response): Promise<void>
             return;
         }
 
-        const messages = await getChatHistoryModel(userId1, userId2);
+        const groupId = req.query.groupId ? parseInt(req.query.groupId as string) : null;
+        const messages = await getChatHistoryModel(userId1, isNaN(userId2) ? null : userId2, isNaN(groupId as any) ? null : groupId);
         res.status(200).json(messages);
     } catch (error) {
         console.error('Get chat history error:', error);

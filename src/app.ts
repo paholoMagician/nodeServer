@@ -6,8 +6,10 @@ import testRoutes from './routes/routes';
 import authRoutes from './routes/auth.routes';
 import chatRoutes from './routes/chat.routes';
 import userRoutes from './routes/user.routes';
+import groupRoutes from './routes/group.routes';
 import { createMessage } from './models/message.model';
 import { updateUserStatus } from './models/user.model';
+import { getGroupsByUser } from './models/group.model';
 
 const app = express();
 // ✅ Cambio para despliegue en la nube
@@ -30,6 +32,7 @@ app.use('/api', testRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/groups', groupRoutes);
 
 // Socket.io Logic
 io.on('connection', (socket: Socket) => {
@@ -40,17 +43,25 @@ io.on('connection', (socket: Socket) => {
         socket.join(userId.toString());
         (socket as any).userId = userId;
 
+        // Join group rooms
+        const groups = await getGroupsByUser(userId);
+        groups.forEach(group => {
+            socket.join(`group_${group.id}`);
+            console.log(`User ${userId} joined room group_${group.id}`);
+        });
+
         await updateUserStatus(userId, true);
         io.emit('userStatus', { userId, isOnline: true });
         console.log(`User ${userId} joined and online`);
     });
 
     socket.on('sendMessage', async (data) => {
-        const { senderId, receiverId, message, file_url } = data;
+        const { senderId, receiverId, groupId, message, file_url } = data;
         try {
             const messageId = await createMessage({
                 from_user_id: senderId,
                 to_user_id: receiverId,
+                group_id: groupId,
                 content: message,
                 file_url: file_url
             });
@@ -58,14 +69,20 @@ io.on('connection', (socket: Socket) => {
             const payload = {
                 id: messageId,
                 sender_id: senderId,
+                receiver_id: receiverId,
+                group_id: groupId,
                 message: message,
                 file_url: file_url,
                 created_at: new Date()
             };
 
-            // Enviar a ambos (Emisor y Receptor)
-            io.to(receiverId.toString()).emit('receiveMessage', payload);
-            io.to(senderId.toString()).emit('receiveMessage', payload);
+            if (groupId) {
+                io.to(`group_${groupId}`).emit('receiveMessage', payload);
+            } else if (receiverId) {
+                // Enviar a ambos (Emisor y Receptor)
+                io.to(receiverId.toString()).emit('receiveMessage', payload);
+                io.to(senderId.toString()).emit('receiveMessage', payload);
+            }
 
         } catch (error) {
             console.error('Error sending message:', error);

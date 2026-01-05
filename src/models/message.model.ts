@@ -4,7 +4,8 @@ import { RowDataPacket, ResultSetHeader } from 'mysql2';
 export interface Message {
     id?: number;
     from_user_id: number;
-    to_user_id: number;
+    to_user_id?: number | null;
+    group_id?: number | null;
     content: string;
     file_url?: string | null;
     created_at?: Date;
@@ -12,21 +13,29 @@ export interface Message {
 
 export const createMessage = async (message: Message): Promise<number> => {
     const [result] = await pool.query<ResultSetHeader>(
-        'INSERT INTO messages (from_user_id, to_user_id, content, file_url) VALUES (?, ?, ?, ?)',
-        [message.from_user_id, message.to_user_id, message.content, message.file_url || null]
+        'INSERT INTO messages (from_user_id, to_user_id, group_id, content, file_url) VALUES (?, ?, ?, ?, ?)',
+        [message.from_user_id, message.to_user_id || null, message.group_id || null, message.content, message.file_url || null]
     );
     return result.insertId;
 };
 
-export const getChatHistory = async (userId1: number, userId2: number): Promise<Message[]> => {
-    const [rows] = await pool.query<RowDataPacket[]>(
-        `SELECT * FROM messages 
-         WHERE (from_user_id = ? AND to_user_id = ?) 
-            OR (from_user_id = ? AND to_user_id = ?) 
-         ORDER BY created_at ASC`,
-        [userId1, userId2, userId2, userId1]
-    );
-    return rows as Message[];
+export const getChatHistory = async (userId1: number, userId2: number | null, groupId: number | null = null): Promise<Message[]> => {
+    if (groupId) {
+        const [rows] = await pool.query<RowDataPacket[]>(
+            'SELECT * FROM messages WHERE group_id = ? ORDER BY created_at ASC',
+            [groupId]
+        );
+        return rows as Message[];
+    } else {
+        const [rows] = await pool.query<RowDataPacket[]>(
+            `SELECT * FROM messages 
+             WHERE group_id IS NULL AND ((from_user_id = ? AND to_user_id = ?) 
+                OR (from_user_id = ? AND to_user_id = ?))
+             ORDER BY created_at ASC`,
+            [userId1, userId2, userId2, userId1]
+        );
+        return rows as Message[];
+    }
 };
 
 export const deleteMessage = async (messageId: number, userId: number): Promise<boolean> => {
