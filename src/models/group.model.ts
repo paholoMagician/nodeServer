@@ -8,6 +8,7 @@ export interface Group {
     group_image?: string;
     created_by: number;
     created_at?: Date;
+    estado?: 'activo' | 'eliminado';
 }
 
 export interface GroupMember {
@@ -44,7 +45,7 @@ export const getGroupsByUser = async (userId: number): Promise<any[]> => {
         `SELECT g.*, gm.role 
          FROM chat_groups g
          JOIN group_members gm ON g.id = gm.group_id
-         WHERE gm.user_id = ?`,
+         WHERE gm.user_id = ? AND g.estado = 'activo'`,
         [userId]
     );
     return rows;
@@ -93,6 +94,19 @@ export const removeAllMembers = async (groupId: number): Promise<boolean> => {
         return true;
     } catch (error) {
         console.error('Remove all members error:', error);
+        return false;
+    }
+};
+
+export const softDeleteGroup = async (groupId: number): Promise<boolean> => {
+    try {
+        await pool.query<ResultSetHeader>(
+            "UPDATE chat_groups SET estado = 'eliminado' WHERE id = ?",
+            [groupId]
+        );
+        return true;
+    } catch (error) {
+        console.error('Soft delete group error:', error);
         return false;
     }
 };

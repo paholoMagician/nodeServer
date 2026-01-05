@@ -150,3 +150,31 @@ export const uploadGroupImage = async (req: Request, res: Response): Promise<voi
         res.status(500).json({ status: 'error', message: 'Internal server error' });
     }
 };
+
+export const deleteGroup = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const groupId = parseInt(req.params.groupId);
+        const userId = (req as any).user.id;
+
+        const group = await GroupModel.getGroupById(groupId);
+        if (!group) {
+            res.status(404).json({ status: 'error', message: 'Group not found' });
+            return;
+        }
+
+        if (group.created_by !== userId) {
+            res.status(403).json({ status: 'error', message: 'Not authorized' });
+            return;
+        }
+
+        const success = await GroupModel.softDeleteGroup(groupId);
+        if (success) {
+            res.status(200).json({ status: 'success', message: 'Group deleted successfully' });
+        } else {
+            res.status(500).json({ status: 'error', message: 'Failed to delete group' });
+        }
+    } catch (error) {
+        console.error('Delete group error:', error);
+        res.status(500).json({ status: 'error', message: 'Internal server error' });
+    }
+};

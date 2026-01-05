@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createGroup, getMyGroups, getGroupMembers, addMembers, getGroupDetails, updateGroup, uploadGroupImage } from '../controllers/group.controller';
+import { createGroup, getMyGroups, getGroupMembers, addMembers, getGroupDetails, updateGroup, uploadGroupImage, deleteGroup } from '../controllers/group.controller';
 import { authenticateToken } from '../middlewares/auth.middleware';
 import multer from 'multer';
 import path from 'path';
@@ -40,5 +40,6 @@ router.put('/:groupId', authenticateToken, updateGroup);
 router.get('/:groupId/members', authenticateToken, getGroupMembers);
 router.post('/:groupId/members', authenticateToken, addMembers);
 router.post('/upload', authenticateToken, upload.single('image'), uploadGroupImage);
+router.delete('/:groupId', authenticateToken, deleteGroup);
 
 export default router;
