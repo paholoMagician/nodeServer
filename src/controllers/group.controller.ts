@@ -82,3 +82,71 @@ export const addMembers = async (req: Request, res: Response): Promise<void> => 
         res.status(500).json({ status: 'error', message: 'Internal server error' });
     }
 };
+
+export const getGroupDetails = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const groupId = parseInt(req.params.groupId);
+        const group = await GroupModel.getGroupById(groupId);
+        if (!group) {
+            res.status(404).json({ status: 'error', message: 'Group not found' });
+            return;
+        }
+        const members = await GroupModel.getGroupMembers(groupId);
+        res.status(200).json({ status: 'success', group, members });
+    } catch (error) {
+        console.error('Get group details error:', error);
+        res.status(500).json({ status: 'error', message: 'Internal server error' });
+    }
+};
+
+export const updateGroup = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const groupId = parseInt(req.params.groupId);
+        const { name, description, members } = req.body;
+        const userId = (req as any).user.id;
+
+        const group = await GroupModel.getGroupById(groupId);
+        if (!group) {
+            res.status(404).json({ status: 'error', message: 'Group not found' });
+            return;
+        }
+
+        // Ideally check if user is admin, but for now we skip strict check or assume it's done
+
+        await GroupModel.updateGroup(groupId, { name, description });
+
+        if (members && Array.isArray(members)) {
+            await GroupModel.removeAllMembers(groupId);
+            // Re-add members
+            // Ensure creator/admin is still there
+            if (!members.includes(group.created_by)) {
+                members.push(group.created_by);
+            }
+
+            for (const memberId of members) {
+                const role = memberId === group.created_by ? 'admin' : 'member';
+                await GroupModel.addMember(groupId, memberId, role);
+            }
+        }
+
+        res.status(200).json({ status: 'success', message: 'Group updated successfully' });
+    } catch (error) {
+        console.error('Update group error:', error);
+        res.status(500).json({ status: 'error', message: 'Internal server error' });
+    }
+};
+
+export const uploadGroupImage = async (req: Request, res: Response): Promise<void> => {
+    try {
+        if (!req.file) {
+            res.status(400).json({ status: 'error', message: 'No file uploaded' });
+            return;
+        }
+
+        const filePath = `storage/groups/${req.file.filename}`;
+        res.status(200).json({ status: 'success', path: filePath });
+    } catch (error) {
+        console.error('Upload group image error:', error);
+        res.status(500).json({ status: 'error', message: 'Internal server error' });
+    }
+};

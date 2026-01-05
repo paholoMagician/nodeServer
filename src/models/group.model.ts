@@ -60,3 +60,39 @@ export const getGroupMembers = async (groupId: number): Promise<any[]> => {
     );
     return rows;
 };
+
+export const getGroupById = async (groupId: number): Promise<Group | null> => {
+    const [rows] = await pool.query<RowDataPacket[]>(
+        'SELECT * FROM chat_groups WHERE id = ?',
+        [groupId]
+    );
+    return rows.length > 0 ? (rows[0] as Group) : null;
+};
+
+export const updateGroup = async (groupId: number, data: Partial<Group>): Promise<boolean> => {
+    const fields = Object.keys(data).map(key => `${key} = ?`).join(', ');
+    const values = [...Object.values(data), groupId];
+
+    if (fields.length === 0) return true;
+
+    try {
+        await pool.query<ResultSetHeader>(
+            `UPDATE chat_groups SET ${fields} WHERE id = ?`,
+            values
+        );
+        return true;
+    } catch (error) {
+        console.error('Update group error:', error);
+        return false;
+    }
+};
+
+export const removeAllMembers = async (groupId: number): Promise<boolean> => {
+    try {
+        await pool.query('DELETE FROM group_members WHERE group_id = ?', [groupId]);
+        return true;
+    } catch (error) {
+        console.error('Remove all members error:', error);
+        return false;
+    }
+};
