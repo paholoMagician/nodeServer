@@ -28,11 +28,11 @@ const io = new Server(httpServer, {
     }
 });
 
-app.use('/api', testRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/chat', chatRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/groups', groupRoutes);
+app.use(['/api', '/'], testRoutes);
+app.use(['/api/auth', '/auth'], authRoutes);
+app.use(['/api/chat', '/chat'], chatRoutes);
+app.use(['/api/users', '/users'], userRoutes);
+app.use(['/api/groups', '/groups'], groupRoutes);
 
 // Socket.io Logic
 io.on('connection', (socket: Socket) => {
